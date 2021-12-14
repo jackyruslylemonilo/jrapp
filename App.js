@@ -1,13 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import React from 'react';
-import type {Node} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -25,8 +16,11 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import codePush from 'react-native-code-push';
 
-const Section = ({children, title}): Node => {
+const codePushOptions = {checkFrequency: codePush.CheckFrequency.ON_APP_RESUME};
+
+const Section = ({children, title}) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
@@ -52,7 +46,7 @@ const Section = ({children, title}): Node => {
   );
 };
 
-const App: () => Node = () => {
+let App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -108,5 +102,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
+
+App = codePush(codePushOptions)(App);
 
 export default App;

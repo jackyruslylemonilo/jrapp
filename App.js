@@ -1,108 +1,105 @@
-import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Button, SafeAreaView, Text, useColorScheme, View} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import codePush from 'react-native-code-push';
 
-const codePushOptions = {checkFrequency: codePush.CheckFrequency.ON_APP_RESUME};
+const centerStyle = {alignItems: 'center', justifyContent: 'center'};
 
-const Section = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
+const OnBoarding = ({setAppToReady}) => {
+  const [percentage, setPercentage] = useState(0);
+
+  useEffect(() => {
+    codePush.sync(
+      {
+        updateDialog: false,
+        installMode: codePush.InstallMode.IMMEDIATE,
+      },
+      status => {
+        if (status === codePush.SyncStatus.UPDATE_INSTALLED) {
+          setAppToReady();
+        }
+      },
+      progress => {
+        setPercentage(Math.ceil(progress.receivedBytes / progress.totalBytes));
+      },
+    );
+  }, [setAppToReady]);
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={centerStyle}>
+      <Text>Downloading {percentage}%</Text>
     </View>
   );
 };
 
-let App = () => {
+const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
+  const [isReady, setIsReady] = useState(false);
+  const [isOnBoarding, setIsOnboarding] = useState(false);
+  const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  const setAppToReady = useCallback(() => {
+    setIsReady(true);
+  }, []);
+
+  useEffect(() => {
+    async function init() {
+      const launchStatus = await AsyncStorage.getItem('LAUNCH_STATUS');
+      const isFirstLaunch = launchStatus === null;
+
+      if (isFirstLaunch) {
+        AsyncStorage.setItem('LAUNCH_STATUS', '1');
+
+        setIsOnboarding(true);
+      } else {
+        codePush.sync(
+          {
+            updateDialog: true,
+            installMode: codePush.InstallMode.ON_NEXT_RESTART,
+          },
+          status => {
+            if (status === codePush.SyncStatus.UPDATE_INSTALLED) {
+              setIsUpdateAvailable(true);
+            }
+          },
+        );
+
+        setIsReady(true);
+      }
+    }
+
+    init();
+  }, []);
+
+  if (!isReady) {
+    return null;
+  }
+
+  if (isOnBoarding) {
+    return <OnBoarding setAppToReady={setAppToReady} />;
+  }
+
   return (
     <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+      <Text>Code Push Update Test</Text>
+
+      {isUpdateAvailable && (
+        <View>
+          Please update your app
+          <Button
+            title="Update App"
+            onPress={() => codePush.restartApp(true)}
+          />
         </View>
-      </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-App = codePush(codePushOptions)(App);
 
 export default App;

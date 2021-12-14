@@ -2,6 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CodePushPublicKey</key>
+	<string>-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuYEoBElKJjENVx3X6Gej
+5MJisPGpbBDkmH2AXOL6yEiuC/Dvo2jo8GsselG9H7Pu9OE0Ef8ivc1Y2n9c2h0I
+xnohN5YDXM6UMp6zxkhIKvIAhoYUy7imJ5PdBdIv9g2nbmXsQT9xVVADzf5Vu5DG
+DA8TARYqVwC9+XcTNp7sk8+eanlPE3D+/+LXXDl+n01GKZxACOuB+AqBIiF7MrWy
+eLC6w4f+cQdNcwoVDpL0INwoaa3KrCC9oAk4C9H9CCKQCi3No3NVUlSUTj8cfnCK
+0cFKCvkd1OJ/Gy2dq/uHFLVBT9S3LDNDNITaUfkq4xqo6ElKe+EVRAIuvSsO4751
+swIDAQAB
+-----END PUBLIC KEY-----</string>
+	<key>CodePushDeploymentKey</key>
+	<string>ca64e2a5-8ac7-4e9c-a39e-ac0d545a095a</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>

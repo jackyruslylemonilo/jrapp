@@ -12,10 +12,12 @@ const App = () => {
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <Text>Code Push Update Test</Text>
+      <Text>Code Push Update Test v2</Text>
       <Button title="Restart App" onPress={() => codePush.restartApp()} />
     </SafeAreaView>
   );
 };
 
-export default App;
+export default codePush({
+  checkFrequency: codePush.CheckFrequency.ON_APP_RESUME,
+})(App);
